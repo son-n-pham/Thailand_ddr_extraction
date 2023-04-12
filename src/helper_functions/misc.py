@@ -7,6 +7,13 @@ import numpy as np
 import hashlib
 
 
+def append_dataframes(df1, df2):
+    df = pd.concat([df1, df2])
+    df = df.groupby(['well', 'bit_sn', 'run_number']).agg(
+        lambda x: x[x.notnull()].iloc[0] if x.notnull().any() else '').reset_index()
+    return df
+
+
 def create_folder_if_not_exist(folder_path):
     """
     Create a folder at the specified folder_path if it does not already exist.

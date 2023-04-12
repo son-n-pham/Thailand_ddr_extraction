@@ -6,6 +6,7 @@ from consolidate_from_extracted_data.consolidate_from_extracted_data import cons
 from constants import Constants
 from helper_functions import helper_functions, misc
 import os
+import shutil
 import time
 import pandas as pd
 
@@ -98,13 +99,33 @@ def main_extraction_from_folder(pdf_folder=Constants.PROCESSING_FOLDER, temp_fol
     results_file = os.path.join(output_folder, 'results.csv')
 
     try:
+        df_result_existing = pd.read_csv(results_file)
+    except FileNotFoundError:
+        print("No existing results.csv file")
+
+    try:
+        df_result_to_user = misc.append_dataframes(
+            df_result_to_user, df_result_existing)
         df_result_to_user.to_csv(results_file, index=False)
         print(f"SAVED TO FINAL CSV {results_file}")
     except AttributeError:
         print("No new data to save to final csv")
+    except NameError:
+        df_result_to_user.to_csv(results_file, index=False)
+
+    misc.create_folder_if_not_exist(
+        folder_path=Constants.OUTPUT_FOLDER_DESKTOP)
+
+    try:
+        shutil.copy(results_file, Constants.OUTPUT_FOLDER_DESKTOP)
+    except FileNotFoundError:
+        print(
+            "No results.csv file to copy to {Constants.OUTPUT_FOLDER_DESKTOP}")
+    except PermissionError:
+        print('Permission denied to copy results.csv to desktop/output folder')
 
 
-def monitor_folder(folder_to_monitor, callback_function=None):
+def monitor_folder(folder_to_monitor):
 
     print(f'Monitoring {folder_to_monitor} ...')
 
@@ -113,6 +134,8 @@ def monitor_folder(folder_to_monitor, callback_function=None):
     # absolute_initial_state = initial_state
 
     while True:
+        misc.create_folder_if_not_exist(folder_path=folder_to_monitor)
+
         files, folders = misc.get_files_and_folders(
             folder_path=folder_to_monitor)
 
@@ -122,7 +145,8 @@ def monitor_folder(folder_to_monitor, callback_function=None):
                                 files,
                                 folders)
         else:
-            print('Monitored folder is empty')
+            misc.create_folder_if_not_exist(
+                folder_path=Constants.PROCESSING_FOLDER)
 
             processing_files, processing_folders = misc.get_files_and_folders(
                 folder_path=Constants.PROCESSING_FOLDER)
@@ -193,11 +217,12 @@ if __name__ == "__main__":
     # df, _ = extract_from_pdf_file(pdf_file)
     # print(df)
 
-    folder_to_monitor = f'C:/Users/phamsonn/Desktop/Drop_DDR_Here'
-    folder_to_process = 'C:/development/Thailand_ddr_extraction/data/processing/folder_to_process'
+    folder_to_monitor = f'C:/Users/{Constants.USERNAME}/Desktop/Drop_DDR_Here'
+    folder_to_process = Constants.PROCESSING_FOLDER
 
-    monitor_folder(folder_to_monitor, callback_function=lambda new_files,
-                   new_folders: misc.move_new_items(folder_to_monitor, folder_to_process, new_files, new_folders))
+    monitor_folder(folder_to_monitor)
+    # monitor_folder(folder_to_monitor, callback_function=lambda new_files,
+    #                new_folders: misc.move_new_items(folder_to_monitor, folder_to_process, new_files, new_folders))
 
     # main_extraction_from_folder(pdf_folder=Constants.DDR_FOLDER,
     #                             temp_folder=Constants.OUTPUT_FOLDER,

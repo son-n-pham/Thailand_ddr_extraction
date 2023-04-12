@@ -7,10 +7,11 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from PyPDF2 import PdfReader
+from helper_functions import misc
 
 from constants import Constants
 
-
+# "C:\Users\user\Desktop"
 # def check_cpu_cores():
 #     # Check if the number of cores has already been saved in a configuration file
 #     if os.path.exists("config.txt"):
@@ -364,6 +365,8 @@ def interpolate_survey(df, well, md, incl_or_azm):
 
 
 def get_latest_file(target_folder, prefix_file_name):
+    misc.create_folder_if_not_exist(
+        folder_path=target_folder)
     # Get the list of all files starting with prefix_file_name in the folder
     files = [f for f in os.listdir(
         target_folder) if f.startswith(prefix_file_name)]
