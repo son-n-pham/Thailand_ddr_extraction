@@ -36,8 +36,11 @@ def consolidate_from_extracted_data(latest_df_ddr, latest_df_wells_survey):
 
         bit_condition = misc.get_first_value(
             group.bit_run_number.values) if group.bit_run_number.any() else np.nan
-
-        bit_condition = 'New' if 'new' in group.bit_run_number.str.lower().values else 'RR'
+        try:
+            bit_condition = 'New' if 'new' in group.bit_run_number.str.lower().values else 'RR'
+        except AttributeError:
+            print(f'Error in bit condition: {group.bit_run_number.values}')
+            bit_condition = ''
 
         mfg = misc.get_first_value(
             group.bit_mfg.values) if group.bit_mfg.any() else np.nan

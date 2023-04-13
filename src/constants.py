@@ -1,5 +1,5 @@
 class Constants:
-    USERNAME = 'user'
+    USERNAME = 'phamsonn'
 
     MONITOR_FOLDER = f'C:/Users/{USERNAME}/Desktop/Drop_DDR_Here'
     PROCESSING_FOLDER = 'C:/development/Thailand_ddr_extraction/data/processing/folder_to_process'
